@@ -4,7 +4,7 @@ if (process.env.BUILD_MODE === 'dev') {
   apiRoot = 'http://localhost:8074'
 }
 if (process.env.BUILD_MODE === 'production') {
-  apiRoot = 'https://trello-web-iouh.vercel.app/'
+  apiRoot = 'https://trello-web-1nki.vercel.app/'
 }
 
 export const API_ROOT = apiRoot
