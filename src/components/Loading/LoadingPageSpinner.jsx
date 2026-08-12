@@ -5,7 +5,7 @@ function LoadingPageSpinner({ caption }) {
   return (
 
     <Box sx={{
-      alignContent: 'center',
+      alignItems: 'center',
       display: 'flex',
       justifyContent: 'center',
       gap: 2,
