@@ -12,7 +12,7 @@ function LoadingPageSpinner({ caption = 'Loading...' }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justify: 'center',
+        justifyContent: 'center',
         gap: 2.5,
         bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#0f172a' : '#f8fafc'),
         position: 'fixed',
@@ -24,9 +24,11 @@ function LoadingPageSpinner({ caption = 'Loading...' }) {
       <Box
         sx={{
           position: 'relative',
+          width: 68,
+          height: 68,
           display: 'flex',
           alignItems: 'center',
-          justify: 'center'
+          justifyContent: 'center'
         }}
       >
         <CircularProgress
@@ -40,17 +42,20 @@ function LoadingPageSpinner({ caption = 'Loading...' }) {
         <Box
           sx={{
             position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
             display: 'flex',
             alignItems: 'center',
-            justify: 'center',
-            width: 36,
-            height: 36,
+            justifyContent: 'center',
+            width: 38,
+            height: 38,
             borderRadius: '50%',
             bgcolor: 'primary.main',
             boxShadow: (theme) =>
               theme.palette.mode === 'dark'
-                ? '0 0 20px rgba(0, 121, 191, 0.6)'
-                : '0 0 16px rgba(0, 121, 191, 0.4)'
+                ? '0 0 18px rgba(0, 121, 191, 0.6)'
+                : '0 0 14px rgba(0, 121, 191, 0.4)'
           }}
         >
           <TrelloIcon style={{ width: 22, height: 22, fill: '#fff' }} />
