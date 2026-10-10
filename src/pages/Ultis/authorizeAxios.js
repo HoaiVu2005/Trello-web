@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { interceptorLoadingElements } from './formatter'

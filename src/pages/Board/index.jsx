@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
 import AppBar from '~/components/AppBar/AppBar'
-import LoadingPageSpinner from '~/components/Loading/LoadingPageSpinner'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-// Grid: https://mui.com/material-ui/react-grid2/#whats-changed
 import Grid from '@mui/material/Unstable_Grid2'
 import Stack from '@mui/material/Stack'
 import Divider from '@mui/material/Divider'
+import Skeleton from '@mui/material/Skeleton'
 import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard'
 import ListAltIcon from '@mui/icons-material/ListAlt'
 import HomeIcon from '@mui/icons-material/Home'
@@ -23,7 +22,7 @@ import SidebarCreateBoardModal from './create'
 import { styled } from '@mui/material/styles'
 import { fetchBoardsAPI } from '~/apis'
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '../Ultis/constants'
-// Styles của mấy cái Sidebar item menu, anh gom lại ra đây cho gọn.
+
 const SidebarItem = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -42,47 +41,73 @@ const SidebarItem = styled(Box)(({ theme }) => ({
 }))
 
 function Boards() {
-  // Số lượng bản ghi boards hiển thị tối đa trên 1 page tùy dự án (thường sẽ là 12 cái)
   const [boards, setBoards] = useState(null)
-  // Tổng toàn bộ số lượng bản ghi boards có trong Database mà phía BE trả về để FE dùng tính toán phân trang
   const [totalBoards, setTotalBoards] = useState(null)
 
-  // Xử lý phân trang từ url với MUI: https://mui.com/material-ui/react-pagination/#router-integration
   const location = useLocation()
-  /**
-   * Parse chuỗi string search trong location về đối tượng URLSearchParams trong JavaScript
-   * https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/URLSearchParams
-   */
   const query = new URLSearchParams(location.search)
 
-  /**
-   * Lấy giá trị page từ query, default sẽ là 1 nếu không tồn tại page từ url.
-   * Nhắc lại kiến thức cơ bản hàm parseInt cần tham số thứ 2 là Hệ thập phân (hệ đếm cơ số 10) để đảm bảo chuẩn số cho phân trang
-   */
   const page = parseInt(query.get('page') || '1', 10)
   const updateStateData = (res) => {
     setBoards(res.boards || [])
     setTotalBoards(res.totalBoards || 0)
-
   }
+
   useEffect(() => {
-    // // Fake tạm 16 cái item thay cho boards
-    // // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-    // setBoards([...Array(16)].map((_, i) => i))
-    // // Fake tạm giả sử trong Database trả về có tổng 100 bản ghi boards
-    // setTotalBoards(100)
-    // Gọi API lấy danh sách boards ở đây...
-    fetchBoardsAPI(location.search).then(updateStateData)
-    // ...
+    fetchBoardsAPI(location.search)
+      .then(updateStateData)
+      .catch(() => {
+        setBoards([])
+      })
   }, [location.search])
 
   const alfterCreateNewBoard = () => {
-    fetchBoardsAPI(location.search).then(updateStateData)
+    fetchBoardsAPI(location.search).then(updateStateData).catch(() => setBoards([]))
   }
 
-  // Lúc chưa tồn tại boards > đang chờ gọi api thì hiện loading
   if (!boards) {
-    return <LoadingPageSpinner caption="Loading Boards..." />
+    return (
+      <Container disableGutters maxWidth={false}>
+        <AppBar />
+        <Box sx={{ paddingX: 2, my: 4 }}>
+          <Grid container spacing={2}>
+            <Grid xs={12} sm={4} md={3}>
+              <Stack direction="column" spacing={1}>
+                <Skeleton variant="rounded" height={44} sx={{ borderRadius: 2 }} />
+                <Skeleton variant="rounded" height={44} sx={{ borderRadius: 2 }} />
+                <Skeleton variant="rounded" height={44} sx={{ borderRadius: 2 }} />
+              </Stack>
+              <Divider sx={{ my: 1 }} />
+              <Skeleton variant="rounded" height={40} sx={{ borderRadius: 2 }} />
+            </Grid>
+
+            <Grid xs={12} sm={8} md={9}>
+              <Skeleton variant="text" width={180} height={40} sx={{ mb: 3 }} />
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: 'repeat(1, 1fr)',
+                    sm: 'repeat(2, 1fr)',
+                    md: 'repeat(3, 1fr)'
+                  },
+                  gap: 2
+                }}
+              >
+                {[1, 2, 3, 4, 5, 6].map((item) => (
+                  <Skeleton
+                    key={item}
+                    variant="rounded"
+                    height={145}
+                    sx={{ borderRadius: 2 }}
+                  />
+                ))}
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+      </Container>
+    )
   }
 
   return (
@@ -90,7 +115,7 @@ function Boards() {
       <AppBar />
       <Box sx={{ paddingX: 2, my: 4 }}>
         <Grid container spacing={2}>
-          <Grid xs={12} sm={3}>
+          <Grid xs={12} sm={4} md={3}>
             <Stack direction="column" spacing={1}>
               <SidebarItem className="active">
                 <SpaceDashboardIcon fontSize="small" />
@@ -111,54 +136,116 @@ function Boards() {
             </Stack>
           </Grid>
 
-          <Grid xs={12} sm={9}>
+          <Grid xs={12} sm={8} md={9}>
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 3 }}>Your boards:</Typography>
 
-            {/* Trường hợp gọi API nhưng không tồn tại cái board nào trong Database trả về */}
             {boards?.length === 0 &&
               <Typography variant="span" sx={{ fontWeight: 'bold', mb: 3 }}>No result found!</Typography>
             }
 
-            {/* Trường hợp gọi API và có boards trong Database trả về thì render danh sách boards */}
             {boards?.length > 0 &&
-              <Grid container spacing={2}>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: 'repeat(1, 1fr)',
+                    sm: 'repeat(2, 1fr)',
+                    md: 'repeat(3, 1fr)'
+                  },
+                  gap: 2
+                }}
+              >
                 {boards.map(b =>
-                  <Grid xs={2} sm={3} md={4} key={b._id}>
-                    <Card sx={{ width: '250px' }}>
-                      {/* Ý tưởng mở rộng về sau làm ảnh Cover cho board nhé */}
-                      {/* <CardMedia component="img" height="100" image="https://picsum.photos/100" /> */}
-                      <Box sx={{ height: '50px', backgroundColor: randomColor() }}></Box>
+                  <Card
+                    key={b._id}
+                    sx={{
+                      width: '100%',
+                      height: '145px',
+                      minWidth: 0,
+                      maxWidth: '100%',
+                      boxSizing: 'border-box',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: '0 6px 16px rgba(0,0,0,0.12)'
+                      }
+                    }}
+                  >
+                    <Box sx={{ height: '45px', minHeight: '45px', backgroundColor: randomColor(), width: '100%' }}></Box>
 
-                      <CardContent sx={{ p: 1.5, '&:last-child': { p: 1.5 } }}>
-                        <Typography gutterBottom variant="h6" component="div">
+                    <CardContent
+                      sx={{
+                        p: 1.5,
+                        flexGrow: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                        minWidth: 0,
+                        boxSizing: 'border-box',
+                        overflow: 'hidden',
+                        '&:last-child': { p: 1.5 }
+                      }}
+                    >
+                      <Box sx={{ overflow: 'hidden', width: '100%', minWidth: 0 }}>
+                        <Typography
+                          gutterBottom
+                          variant="h6"
+                          component="div"
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            lineHeight: 1.2,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            width: '100%',
+                            mb: 0.5
+                          }}
+                        >
                           {b?.title}
                         </Typography>
                         <Typography
                           variant="body2"
                           color="text.secondary"
-                          sx={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}> {b.description}
-                        </Typography>
-                        <Box
-                          component={Link}
-                          to={`/boards/${b._id}`}
                           sx={{
-                            mt: 1,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-end',
-                            color: 'primary.main',
-                            '&:hover': { color: 'primary.light' }
-                          }}>
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            width: '100%',
+                            fontSize: '0.85rem'
+                          }}
+                        >
+                          {b?.description || 'No description available'}
+                        </Typography>
+                      </Box>
+                      <Box
+                        component={Link}
+                        to={`/boards/${b._id}`}
+                        sx={{
+                          mt: 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'flex-end',
+                          color: 'primary.main',
+                          fontSize: '0.85rem',
+                          fontWeight: 500,
+                          textDecoration: 'none',
+                          '&:hover': { color: 'primary.light' }
+                        }}
+                      >
                           Go to board <ArrowRightIcon fontSize="small" />
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Grid>
+                      </Box>
+                    </CardContent>
+                  </Card>
                 )}
-              </Grid>
+              </Box>
             }
 
-            {/* Trường hợp gọi API và có totalBoards trong Database trả về thì render khu vực phân trang  */}
             {(totalBoards > 0) &&
               <Box sx={{ my: 3, pr: 5, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                 <Pagination
@@ -166,11 +253,8 @@ function Boards() {
                   color="secondary"
                   showFirstButton
                   showLastButton
-                  // Giá trị prop count của component Pagination là để hiển thị tổng số lượng page, công thức là lấy Tổng số lượng bản ghi chia cho số lượng bản ghi muốn hiển thị trên 1 page (ví dụ thường để 12, 24, 26, 48...vv). sau cùng là làm tròn số lên bằng hàm Math.ceil
                   count={Math.ceil(totalBoards / DEFAULT_ITEMS_PER_PAGE)}
-                  // Giá trị của page hiện tại đang đứng
                   page={page}
-                  // Render các page item và đồng thời cũng là những cái link để chúng ta click chuyển trang
                   renderItem={(item) => (
                     <PaginationItem
                       component={Link}

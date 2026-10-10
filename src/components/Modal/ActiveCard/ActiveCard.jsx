@@ -42,7 +42,7 @@ import { updateCardInBoard } from '~/redux/activeBoard/activeBoardSlice'
 import { selectCurrentUser } from '~/redux/User/userSlice'
 import { CARD_MEMBER_ACTION } from '~/pages/Ultis/constants'
 import { socketIoInstance } from '~/socketClient'
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove'
 const SidebarItem = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -67,19 +67,12 @@ const SidebarItem = styled(Box)(({ theme }) => ({
   }
 }))
 
-/**
- * Note: Modal là một low-component mà bọn MUI sử dụng bên trong những thứ như Dialog, Drawer, Menu, Popover. Ở đây dĩ nhiên chúng ta có thể sử dụng Dialog cũng không thành vấn đề gì, nhưng sẽ sử dụng Modal để dễ linh hoạt tùy biến giao diện từ con số 0 cho phù hợp với mọi nhu cầu nhé.
- */
 function ActiveCard() {
   const dispatch = useDispatch()
   const activeCard = useSelector(selectCurrentActiveCard)
   const isShowCurrentActiveCard = useSelector(selectIsShowModalActiveCard)
-  // const [isOpen, setIsOpen] = useState(true)
-  // const handleOpenModal = () => setIsOpen(true)
   const handleCloseModal = () => {
-    // setIsOpen(false)
     dispatch(clearAndHideCurrentActiveCard())
-
   }
 
   const callApiUpdateCard = async (updateData) => {
@@ -138,16 +131,18 @@ function ActiveCard() {
       sx={{ overflowY: 'auto' }}>
       <Box sx={{
         position: 'relative',
-        width: 900,
-        maxWidth: 900,
+        width: { xs: '95vw', sm: '90vw', md: 900 },
+        maxWidth: '95vw',
+        maxHeight: '90vh',
+        overflowY: 'auto',
         bgcolor: 'white',
         boxShadow: 24,
         borderRadius: '8px',
         border: 'none',
         outline: 0,
-        padding: '40px 20px 20px',
-        margin: '50px auto',
-        backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#1A2027' : '#fff'
+        padding: { xs: '30px 14px 20px', sm: '40px 20px 20px' },
+        margin: { xs: '20px auto', sm: '40px auto' },
+        backgroundColor: (theme) => (theme.palette.mode === 'dark' ? '#1A2027' : '#fff')
       }}>
         <Box sx={{
           position: 'absolute',
@@ -161,7 +156,7 @@ function ActiveCard() {
         {activeCard?.cover &&
           <Box sx={{ mb: 4 }}>
             <img
-              style={{ width: '100%', height: '320px', borderRadius: '6px', objectFit: 'cover' }}
+              style={{ width: '100%', maxHeight: '320px', height: 'auto', borderRadius: '6px', objectFit: 'cover' }}
               src={activeCard?.cover}
               alt="card-cover"
             />

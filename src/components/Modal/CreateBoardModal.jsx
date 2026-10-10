@@ -35,7 +35,6 @@ export function CreateBoardModal({ alfterCreateNewBoard, isOpen, handleCloseModa
   return (
     <Modal
       open={isOpen}
-      // onClose={handleCloseModal} // chỉ sử dụng onClose trong trường hợp muốn đóng Modal bằng nút ESC hoặc click ra ngoài Modal
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
@@ -44,14 +43,17 @@ export function CreateBoardModal({ alfterCreateNewBoard, isOpen, handleCloseModa
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: 600,
+        width: { xs: '90vw', sm: '500px', md: '600px' },
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        overflowY: 'auto',
         bgcolor: 'white',
         boxShadow: 24,
         borderRadius: '8px',
         border: 'none',
         outline: 0,
-        padding: '20px 30px',
-        backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#1A2027' : 'white'
+        padding: { xs: '16px 20px', sm: '20px 30px' },
+        backgroundColor: (theme) => (theme.palette.mode === 'dark' ? '#1A2027' : 'white')
       }}>
         <Box sx={{
           position: 'absolute',
@@ -118,11 +120,6 @@ export function CreateBoardModal({ alfterCreateNewBoard, isOpen, handleCloseModa
                 <FieldErrorAlert errors={errors} fieldName={'description'} />
               </Box>
 
-              {/*
-                  * Lưu ý đối với RadioGroup của MUI thì không thể dùng register tương tự TextField được mà phải sử dụng <Controller /> và props "control" của react-hook-form như cách làm dưới đây
-                  * https://stackoverflow.com/a/73336101
-                  * https://mui.com/material-ui/react-radio-button/
-                */}
               <Controller
                 name="type"
                 defaultValue={BOARD_TYPES.PUBLIC}

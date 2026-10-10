@@ -15,58 +15,84 @@ import AutoCompleteSearchBoard from './SearchBoards/AutoCompleteSearchBoard'
 import { useState } from 'react'
 import { CreateBoardModal } from '../Modal/CreateBoardModal'
 import { useForm } from 'react-hook-form'
+
 function AppBar() {
   const [isOpenMoDal, setIsOpenModel] = useState(false)
   const { reset } = useForm()
+
   const handleOpenModal = () => {
     setIsOpenModel(true)
   }
   const handleCloseModal = () => {
     setIsOpenModel(false)
-    // Reset lại toàn bộ form khi đóng Modal
     reset()
   }
+
   return (
-    <div>
-      <Box sx={{ overflowY: 'hidden', display: 'flex', overflowX: 'auto', alignItems: 'center', justifyContent: 'space-between', width: '100%', px: 2, height: (theme) => theme.trello.appBarHeight, bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#2C3E50' : '#1575C0') }}>
-        <Box sx={{
-          display: 'flex', alignItems: 'center', gap: 2
-        }}>
-          <Tooltip title='Board Lists' >
-            <Link to='/boards'><AppsIcon sx={{ color: 'white', verticalAlign: 'middle' }} /></Link>
-
-          </Tooltip>
-          <Link to='/' style={{ textDecoration: 'none' }}>
-            <Box sx={{
-              display: 'flex', alignItems: 'center', gap: 0.5
-            }}>
-
-              <AccessibleForwardIcon sx={{ color: 'white ', fontSize: 30 }} />
-              <Typography sx={{ color: 'white', fontSize: '20px', fontWeight: 600 }}>Trello</Typography>
-
-            </Box>
+    <Box
+      sx={{
+        width: '100%',
+        height: (theme) => theme.trello.appBarHeight,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 1,
+        px: 2,
+        overflowX: 'auto',
+        bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#2C3E50' : '#1575C0'),
+        '&::-webkit-scrollbar': { height: '4px' },
+        '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255, 255, 255, 0.3)', borderRadius: '4px' }
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Tooltip title="Board Lists">
+          <Link to="/boards" aria-label="View Board List">
+            <AppsIcon sx={{ color: 'white', verticalAlign: 'middle' }} />
           </Link>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Workspace />
-            <Recent />
-            <Started />
-            <Template />
-            <Button onClick={handleOpenModal} sx={{ color: 'white', textTransform: 'none' }} variant="text"><AddToPhotosIcon sx={{ marginRight: '8px' }} />Create</Button>
+        </Tooltip>
+
+        <Link to="/" style={{ textDecoration: 'none' }} aria-label="Trello Home">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <AccessibleForwardIcon sx={{ color: 'white', fontSize: 30 }} />
+            <Typography sx={{ color: 'white', fontSize: '20px', fontWeight: 600, display: { xs: 'none', sm: 'block' } }}>
+              Trello
+            </Typography>
           </Box>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <AutoCompleteSearchBoard />
-          <ModeSelect />
-          <Notifications />
-          <Tooltip title="Help">
-            <HelpOutlineOutlinedIcon sx={{ color: 'white', cursor: 'pointer' }} fontSize='medium' />
-          </Tooltip>
-          <Profile />
+        </Link>
+
+        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
+          <Workspace />
+          <Recent />
+          <Started />
+          <Template />
+          <Button
+            onClick={handleOpenModal}
+            sx={{ color: 'white', textTransform: 'none' }}
+            variant="text"
+          >
+            <AddToPhotosIcon sx={{ marginRight: '8px' }} />Create
+          </Button>
         </Box>
       </Box>
+
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <AutoCompleteSearchBoard />
+        <ModeSelect />
+        <Notifications />
+        <Tooltip title="Help">
+          <HelpOutlineOutlinedIcon
+            sx={{ color: 'white', cursor: 'pointer', display: { xs: 'none', sm: 'inline-flex' } }}
+            fontSize="medium"
+          />
+        </Tooltip>
+        <Profile />
+      </Box>
+
       <CreateBoardModal isOpen={isOpenMoDal} handleCloseModal={handleCloseModal} />
-    </div>
+    </Box>
   )
 }
 
 export default AppBar
+
+

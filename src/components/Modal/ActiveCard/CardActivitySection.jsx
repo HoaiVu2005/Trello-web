@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import moment from 'moment'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Avatar from '@mui/material/Avatar'
 import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
+import Button from '@mui/material/Button'
+import SendIcon from '@mui/icons-material/Send'
 
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/User/userSlice'
@@ -11,43 +14,66 @@ import { socketIoInstance } from '~/socketClient'
 
 function CardActivitySection({ cardComment, onAddCardComment }) {
   const currentUser = useSelector(selectCurrentUser)
+  const [commentText, setCommentText] = useState('')
+
+  const handleSendComment = () => {
+    const trimmedContent = commentText.trim()
+    if (!trimmedContent) return
+
+    const commentToAdd = {
+      userAvatar: currentUser?.avatar,
+      userDisplayName: currentUser?.displayName,
+      content: trimmedContent
+    }
+    onAddCardComment(commentToAdd).then((resComment) => {
+      setCommentText('')
+      if (resComment) {
+        socketIoInstance.emit('FE_COMMENT_TO_DIFFERENT_USER', resComment)
+      }
+    })
+  }
 
   const handleAddCardComment = (event) => {
-    // Bắt hành động người dùng nhấn phím Enter && không phải hành động Shift + Enter
     if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault() // Thêm dòng này để khi Enter không bị nhảy dòng
-      if (!event.target?.value) return // Nếu không có giá trị gì thì return không làm gì cả
-
-      // Tạo một biến commend data để gửi api
-      const commentToAdd = {
-        userAvatar: currentUser?.avatar,
-        userDisplayName: currentUser?.displayName,
-        content: event.target.value.trim()
-      }
-      onAddCardComment(commentToAdd).then((resComment) => {
-        event.target.value = ''
-        socketIoInstance.emit('FE_COMMENT_TO_DIFFERENT_USER', resComment)
-      })
+      event.preventDefault()
+      handleSendComment()
     }
   }
 
   return (
     <Box sx={{ mt: 2 }}>
       {/* Xử lý thêm comment vào Card */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-        <Avatar
-          sx={{ width: 36, height: 36, cursor: 'pointer' }}
-          alt="trungquandev"
-          src={currentUser?.avatar}
-        />
-        <TextField
-          fullWidth
-          placeholder="Write a comment..."
-          type="text"
-          variant="outlined"
-          multiline
-          onKeyDown={handleAddCardComment}
-        />
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2, width: '100%' }}>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+          <Avatar
+            sx={{ width: 36, height: 36, cursor: 'pointer', mt: 0.5 }}
+            alt={currentUser?.displayName}
+            src={currentUser?.avatar}
+          />
+          <TextField
+            fullWidth
+            placeholder="Write a comment..."
+            type="text"
+            variant="outlined"
+            multiline
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            onKeyDown={handleAddCardComment}
+          />
+        </Box>
+        <Box sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'flex-end', pl: '44px' }}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            disabled={!commentText.trim()}
+            onClick={handleSendComment}
+            endIcon={<SendIcon />}
+            sx={{ textTransform: 'none' }}
+          >
+            Send
+          </Button>
+        </Box>
       </Box>
 
       {/* Hiển thị danh sách các comments */}
@@ -56,7 +82,7 @@ function CardActivitySection({ cardComment, onAddCardComment }) {
       }
       {cardComment.map((comment, index) =>
         <Box sx={{ display: 'flex', gap: 1, width: '100%', mb: 1.5 }} key={index}>
-          <Tooltip title="trungquandev">
+          <Tooltip title={comment?.userDisplayName || 'User'}>
             <Avatar
               sx={{ width: 36, height: 36, cursor: 'pointer' }}
               alt={comment?.userDisplayName}
@@ -92,3 +118,4 @@ function CardActivitySection({ cardComment, onAddCardComment }) {
 }
 
 export default CardActivitySection
+

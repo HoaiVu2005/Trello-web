@@ -35,33 +35,24 @@ function Notifications() {
   const handleClose = () => {
     setAnchorEl(null)
   }
-  // State đơn giản để kiểm tra có thông báo mới hay không
   const [newNotification, setNewNotification] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const currentUser = useSelector(selectCurrentUser)
-  // Lấy data notification từ redux
   const notifications = useSelector(selectCurrentNotifications)
-  // fetch list invitation
   useEffect(() => {
     dispatch(fetchInvitationsAPI())
-    // Tạo 1 function xử lý khi nhận được sự kiện realtime 
     const onReceiveNewInvitation = (invitation) => {
       if (invitation.inviteeId === currentUser._id) {
-        // B1: Thêm bản ghi invitation vào redux
         dispatch(addNotifications(invitation))
-        //B2: Cập nhật trạng thái đang có thông báo đến
         setNewNotification(true)
       }
-
     }
     const onReceiveNewInvitationResonse = (invitationRes) => {
-
       if (invitationRes.inviterId === currentUser._id) {
         dispatch(addNotifications(invitationRes))
         setNewNotification(true)
       }
-
     }
     socketIoInstance.on('BE_USER_INVITED_TO_BOARD', onReceiveNewInvitation)
     socketIoInstance.on('BE_INVITED_BOARD_RESPONE_TO_INVITER', onReceiveNewInvitationResonse)
@@ -97,8 +88,6 @@ function Notifications() {
       <Tooltip title="Notifications">
         <Badge
           color="warning"
-          // variant="none"
-          // variant="dot"
           variant={newNotification ? 'dot' : 'none'}
           sx={{ cursor: 'pointer' }}
           id="basic-button-open-notification"
@@ -108,7 +97,6 @@ function Notifications() {
           onClick={handleClickNotificationIcon}
         >
           <NotificationsNoneIcon sx={{
-            // color: 'white'
             color: newNotification ? 'yellow' : 'white'
           }} />
         </Badge>
@@ -133,7 +121,6 @@ function Notifications() {
               overflowY: 'auto'
             }}>
               <Box sx={{ maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'pre-wrap', display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {/* Nội dung của thông báo */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Box><GroupAddIcon fontSize="small" /></Box>
                   {(notification.boardInvitation?.status === BOARD_INVITATION_STATUS.ACCEPTED) &&
@@ -147,7 +134,6 @@ function Notifications() {
                   }
                 </Box>
 
-                {/* Khi Status của thông báo này là PENDING thì sẽ hiện 2 Button */}
                 {notification.boardInvitation.status === BOARD_INVITATION_STATUS.PENDING &&
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-end' }}>
                     <Button
@@ -173,8 +159,6 @@ function Notifications() {
                   </Box>
                 }
 
-
-                {/* Khi Status của thông báo này là ACCEPTED hoặc REJECTED thì sẽ hiện thông tin đó lên */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-end' }}>
                   {notification.boardInvitation.status === BOARD_INVITATION_STATUS.ACCEPTED &&
                     <Chip icon={<DoneIcon />} label="Accepted" color="success" size="small" />
@@ -184,7 +168,6 @@ function Notifications() {
                   }
                 </Box>
 
-                {/* Thời gian của thông báo */}
                 <Box sx={{ textAlign: 'right' }}>
                   <Typography variant="span" sx={{ fontSize: '13px' }}>
                     {moment(notification.createdAt).format('llll')}
@@ -192,7 +175,6 @@ function Notifications() {
                 </Box>
               </Box>
             </MenuItem>
-            {/* Cái đường kẻ Divider sẽ không cho hiện nếu là phần tử cuối */}
             {index !== (notifications.length - 1) && <Divider />}
           </Box>
         )}

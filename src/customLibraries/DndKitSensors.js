@@ -1,4 +1,4 @@
-import { MouseSensor as DndKitMouseSensor, TouchSensor as DndKitTouchSensor } from '@dnd-kit/core';
+import { MouseSensor as DndKitMouseSensor, TouchSensor as DndKitTouchSensor } from '@dnd-kit/core'
 
 // Block DnD event propagation if element have "data-no-dnd" attribute
 const handler = ({ nativeEvent: event }) => {
