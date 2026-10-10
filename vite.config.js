@@ -4,13 +4,13 @@ import svgr from 'vite-plugin-svgr'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/',
   define: {
     'process.env': process.env
   },
   plugins: [react(),
   svgr()
   ],
-  // base: './'
   resolve: {
     alias: [
       { find: '~', replacement: '/src' }
